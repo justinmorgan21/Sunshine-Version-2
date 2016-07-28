@@ -2,7 +2,10 @@
 <resources>
 
     <string name="app_name">Sunshine</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="date_message">Today, July 26</string>
+    <string name="temp_high">21\u00B0</string>
+    <string name="temp_low">8\u00B0</string>
+    <string name="weather_cloudy_text">Cloudy</string>
     <string name="action_settings">Settings</string>
 
 </resources>
