@@ -7,5 +7,6 @@
     <string name="temp_low">8\u00B0</string>
     <string name="weather_cloudy_text">Cloudy</string>
     <string name="action_settings">Settings</string>
+    <string name="action_refresh" translatable="false">Refresh</string>
 
 </resources>
