@@ -1,8 +1,11 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -15,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jmorgan on 7/28/2016.
@@ -58,27 +59,40 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            new FetchWeatherTask().execute("94043");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String locationPreference = sharedPref.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_default_location));
+        new FetchWeatherTask().execute(locationPreference);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        List<String> forecastArray = new ArrayList<String>();
+        /*List<String> forecastArray = new ArrayList<String>();
         forecastArray.add("Today - Sunny - 88/63");
         forecastArray.add("Tomorrow - Foggy - 70/46");
         forecastArray.add("Weds - Cloudy - 72/63");
         forecastArray.add("Thurs - Rainy - 64/51");
         forecastArray.add("Fri - Foggy - 70/46");
-        forecastArray.add("Sat - Sunny - 76/68");
+        forecastArray.add("Sat - Sunny - 76/68");*/
 
         mForecastAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast, R.id.list_item_forecast_textview,
-                forecastArray);
+                new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -87,10 +101,10 @@ public class ForecastFragment extends Fragment {
 
         forecastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getActivity(),
-                        mForecastAdapter.getItem(i),
-                        Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, mForecastAdapter.getItem(pos));
+                startActivity(detailIntent);
             }
         });
 
@@ -100,7 +114,6 @@ public class ForecastFragment extends Fragment {
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -302,6 +315,14 @@ public class ForecastFragment extends Fragment {
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
+
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String unitsPref = sharedPref.getString(getString(R.string.pref_units_key),
+                        getString(R.string.pref_units_metric));
+                if (unitsPref.equals(getString(R.string.pref_units_imperial))) {
+                    high = high * 1.8 + 32;
+                    low = low * 1.8 + 32;
+                }
 
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
