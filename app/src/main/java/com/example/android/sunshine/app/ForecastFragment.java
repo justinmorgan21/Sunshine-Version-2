@@ -99,6 +99,7 @@ public class ForecastFragment extends Fragment {
         ListView forecastListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         forecastListView.setAdapter(mForecastAdapter);
 
+        //Starts a detail activity when the list item is clicked
         forecastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
@@ -134,7 +135,7 @@ public class ForecastFragment extends Fragment {
             String location = params[0];
             String format = "json";
             String units = "metric";
-            int numDays = 7;
+            int numDays = 10;
             String id = BuildConfig.OPEN_WEATHER_MAP_API_KEY;
 
             try {
