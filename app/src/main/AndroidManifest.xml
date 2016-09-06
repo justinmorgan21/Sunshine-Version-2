@@ -37,7 +37,15 @@
         </activity>
         <provider
             android:authorities="com.example.android.sunshine.app"
-            android:name=".data.WeatherProvider" />
+            android:name=".data.WeatherProvider"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.example.ACCESS_DATABASE"/>
     </application>
+    
+    <permission android:name="com.example.ACCESS_DATABASE"
+        android:protectionLevel="dangerous"
+        android:label="Access Database">
+    </permission>
 
 </manifest>
